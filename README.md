@@ -6,7 +6,7 @@
 
 Se o script for executado sem nenhuma flag:
 
-# python3 analysis_mouse_cortex.py
+#### python3 analysis_mouse_cortex.py
 
 Ele ativa automaticamente o modo --all
 
