@@ -58,8 +58,7 @@ def salvar_texto(nome, conteudo):
 
 
 def salvar_figura(nome):
-    plt.tight_layout()
-    plt.savefig(f"resultados/figuras/{nome}", dpi=300)
+    plt.savefig(f"resultados/figuras/{nome}", dpi=300, bbox_inches='tight')
     plt.close()
 
 
@@ -528,7 +527,7 @@ def analisar_mst(G, weight='weight'):
     plt.figure(figsize=(8, 8))
     pos = nx.spring_layout(mst, seed=42)
     nx.draw(mst, pos, node_size=30, with_labels=False, edge_color='black')
-    plt.title("Minimum Spanning Tree (MST)")
+    plt.title("Arvore geradora minima")
     salvar_figura("mst.png")
 
 def main():
@@ -538,45 +537,45 @@ def main():
     parser = argparse.ArgumentParser(
         description=(
             "Análise completa da rede Mouse Visual Cortex (GraphML). "
-            "Use uma ou mais flags para selecionar análises específicas."
+            "Use uma ou mais flags para selecionar análises específicas"
         )
     )
 
     parser.add_argument("--info", action="store_true",
-        help="Mostra informações básicas: vértices, arestas, densidade e graus extremos.")
+        help="Mostra informações básicas: vértices, arestas, densidade e graus extremos")
 
     parser.add_argument("--componentes", action="store_true",
-        help="Analisa componentes conexas (fracas e fortes) e extrai a maior WCC.")
+        help="Analisa componentes conexas (fracas e fortes) e extrai a maior WCC")
 
     parser.add_argument("--ciclos", action="store_true",
-        help="Verifica a existência de ciclos na maior componente fraca.")
+        help="Verifica a existência de ciclos na maior componente fraca")
 
     parser.add_argument("--distancias", action="store_true",
-        help="Calcula excentricidade, raio, diâmetro, centro e periferia.")
+        help="Calcula excentricidade, raio, diâmetro, centro e periferia")
 
     parser.add_argument("--graus", action="store_true",
-        help="Gera estatísticas da distribuição de graus e gráficos (histograma e CCDF).")
+        help="Gera estatísticas da distribuição de graus e gráficos (histograma e CCDF)")
 
     parser.add_argument("--centralidades", action="store_true",
-        help="Centralidades: grau, intermediação, proximidade e autovetor.")
+        help="Centralidades: grau, intermediação, proximidade e autovetor")
 
     parser.add_argument("--clustering", action="store_true",
-        help="Coeficientes de agrupamento local/global e comparação com ER equivalente.")
+        help="Coeficientes de agrupamento local/global e comparação com ER equivalente")
 
     parser.add_argument("--modelos", action="store_true",
-        help="Compara a rede com os modelos ER, BA e WS gerados com parâmetros equivalentes.")
+        help="Compara a rede com os modelos ER, BA e WS gerados com parâmetros equivalentes")
 
     parser.add_argument("--mst", action="store_true",
-        help="Gera a árvore geradora mínima (MST) e salva resultados.")
+        help="Gera a árvore geradora mínima (MST) e salva resultados")
 
     parser.add_argument("--all", action="store_true",
-        help="Executa todas as análises básicas.")
+        help="Executa todas as análises básicas")
 
     parser.add_argument("--avancado", action="store_true",
         help=(
             "Executa análises avançadas: cliques, triadic census, assortatividade, robustez, "
             "100 instâncias ER/BA/WS, Girvan-Newman, pontos de articulação, eficiência "
-            "e transitividade."
+            "e transitividade"
         )
     )
 
@@ -584,7 +583,7 @@ def main():
 
     #  Default: se nenhuma flag for passada, ativa --all
     if not any(vars(args).values()):
-        print("Nenhuma flag foi especificada, executando padrão (--all).")
+        print("Nenhuma flag foi especificada, executando padrão (--all)")
         args.all = True
 
 #analises
