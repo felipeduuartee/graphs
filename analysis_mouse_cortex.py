@@ -13,6 +13,7 @@ Modo básico:
     --centralidades
     --clustering
     --modelos
+    --mst
 
 Modo avançado:
     --avancado
@@ -28,8 +29,7 @@ Modo avançado:
         (9) Transitividade
         (10) Joint-degree distribution
 
-Tudo é automaticamente salvo em:
-    resultados/
+Tudo é  salvo em: resultados/
 """
 
 import argparse
@@ -118,7 +118,7 @@ def analisar_componentes(G):
 
 
 def analisar_ciclos(G):
-    print("verificando se há ciclos na rede[...]")
+    print("verificando se há ciclos na rede")
 
     possui_ciclo = not nx.is_directed_acyclic_graph(G)
 
@@ -485,6 +485,52 @@ def avancado_transitividade(G):
     print(texto)
 
 
+def analisar_mst(G, weight='weight'):
+    UG = G.to_undirected()
+
+    # se não existe peso, defino como 1.0
+    if not any('weight' in d for _, _, d in UG.edges(data=True)):
+        for u, v, d in UG.edges(data=True):
+            d['weight'] = 1.0
+
+    mst = nx.minimum_spanning_tree(UG, weight=weight)
+
+    n = mst.number_of_nodes()
+    m = mst.number_of_edges()
+    try:
+        diam = nx.diameter(mst)
+    except Exception:
+        diam = 'N/A'
+    try:
+        apl = nx.average_shortest_path_length(mst)
+    except Exception:
+        apl = 'N/A'
+
+    graus = [mst.degree(v) for v in mst.nodes()]
+    texto = (
+        f"MST\n"
+        f"Número de vértices: {n}\n"
+        f"Número de arestas: {m}\n"
+        f"Diâmetro: {diam}\n"
+        f"Avg shortest path length: {apl}\n"
+        f"Grau máximo: {max(graus) if graus else 0}\n"
+        f"Grau médio: {np.mean(graus) if graus else 0}\n"
+    )
+
+    salvar_texto("mst.txt", texto)
+
+    with open("resultados/tabelas/mst_edges.csv", "w", encoding="utf-8") as f:
+        f.write("u,v\n")
+        for u, v in mst.edges():
+            f.write(f"{u},{v}\n")
+
+    # representacao simples
+    plt.figure(figsize=(8, 8))
+    pos = nx.spring_layout(mst, seed=42)
+    nx.draw(mst, pos, node_size=30, with_labels=False, edge_color='black')
+    plt.title("Minimum Spanning Tree (MST)")
+    salvar_figura("mst.png")
+
 def main():
     garantir_pastas()
     G = carregar_grafo()
@@ -520,6 +566,9 @@ def main():
     parser.add_argument("--modelos", action="store_true",
         help="Compara a rede com os modelos ER, BA e WS gerados com parâmetros equivalentes.")
 
+    parser.add_argument("--mst", action="store_true",
+        help="Gera a árvore geradora mínima (MST) e salva resultados.")
+
     parser.add_argument("--all", action="store_true",
         help="Executa todas as análises básicas.")
 
@@ -535,7 +584,7 @@ def main():
 
     #  Default: se nenhuma flag for passada, ativa --all
     if not any(vars(args).values()):
-        print("[AVISO] Nenhuma flag foi especificada. Executando modo padrão (--all).")
+        print("Nenhuma flag foi especificada, executando padrão (--all).")
         args.all = True
 
 #analises
@@ -570,6 +619,9 @@ def main():
     if args.all or args.modelos:
         comparar_modelos(G_maior)
 
+    if args.mst:
+        analisar_mst(G_maior)
+
     if args.avancado:
         avancado_cliques(G_maior)
         avancado_triadic(G_maior)
@@ -581,7 +633,7 @@ def main():
         avancado_eficiencia(G_maior)
         avancado_transitividade(G_maior)
 
-    print("Análises concluídas. Resultados em /resultados.")
+    print("Analise finalizada. Resultados na pasta resultados")
 
 
 if __name__ == "__main__":
