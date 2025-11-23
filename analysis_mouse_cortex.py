@@ -484,6 +484,7 @@ def avancado_transitividade(G):
     print(texto)
 
 
+# gero a arvore geradora minima e maxima 
 def analisar_mst(G, weight='weight'):
     UG = G.to_undirected()
 
@@ -529,6 +530,46 @@ def analisar_mst(G, weight='weight'):
     nx.draw(mst, pos, node_size=30, with_labels=False, edge_color='black')
     plt.title("Arvore geradora minima")
     salvar_figura("mst.png")
+    
+    # Gera tambem a arvore geradora maxima
+    try:
+        maxst = nx.maximum_spanning_tree(UG, weight=weight)
+        n2 = maxst.number_of_nodes()
+        m2 = maxst.number_of_edges()
+        try:
+            diam2 = nx.diameter(maxst)
+        except Exception:
+            diam2 = 'N/A'
+        try:
+            apl2 = nx.average_shortest_path_length(maxst)
+        except Exception:
+            apl2 = 'N/A'
+
+        graus2 = [maxst.degree(v) for v in maxst.nodes()]
+        texto2 = (
+            f"MAXST\n"
+            f"Número de vértices: {n2}\n"
+            f"Número de arestas: {m2}\n"
+            f"Diâmetro: {diam2}\n"
+            f"Avg shortest path length: {apl2}\n"
+            f"Grau máximo: {max(graus2) if graus2 else 0}\n"
+            f"Grau médio: {np.mean(graus2) if graus2 else 0}\n"
+        )
+
+        salvar_texto("maxst.txt", texto2)
+
+        with open("resultados/tabelas/maxst_edges.csv", "w", encoding="utf-8") as f:
+            f.write("u,v\n")
+            for u, v in maxst.edges():
+                f.write(f"{u},{v}\n")
+
+        plt.figure(figsize=(8, 8))
+        pos2 = nx.spring_layout(maxst, seed=42)
+        nx.draw(maxst, pos2, node_size=30, with_labels=False, edge_color='black')
+        plt.title("Arvore geradora maxima")
+        salvar_figura("maxst.png")
+    except Exception as e:
+        print("Erro ao gerar MaxST:", e)
 
 def main():
     garantir_pastas()
@@ -566,7 +607,7 @@ def main():
         help="Compara a rede com os modelos ER, BA e WS gerados com parâmetros equivalentes")
 
     parser.add_argument("--mst", action="store_true",
-        help="Gera a árvore geradora mínima (MST) e salva resultados")
+        help="Gera a árvore geradora mínima e a árvore geradora máxima  e salva resultados")
 
     parser.add_argument("--all", action="store_true",
         help="Executa todas as análises básicas")
