@@ -619,7 +619,7 @@ def main():
     if args.all or args.modelos:
         comparar_modelos(G_maior)
 
-    if args.mst:
+    if args.all or args.mst:
         analisar_mst(G_maior)
 
     if args.avancado:
